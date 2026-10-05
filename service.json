@@ -1,0 +1,79 @@
+{
+    "id": "sage",
+    "name": "Sage Accounting",
+    "version": "1.0.0",
+    "description": "Connects the shop to Sage Accounting (OAuth2) and adds a 'Push to Sage' button on paid orders that creates a sales invoice. Locked to one named Sage business",
+    "category": "business",
+    "author": {
+        "name": "Gavin Cox"
+    },
+    "license": "proprietary",
+
+    "requires": {
+        "osmium": ">=1.0.0",
+        "php": ">=8.1",
+        "services": []
+    },
+
+    "autoload": [
+        "models"
+    ],
+
+    "migrations": "migrations",
+
+    "hooks": {
+        "order.panels": [
+            "Osmium\\Services\\Sage\\Models\\SageOrderSync::orderPanel"
+        ],
+        "order.action": [
+            "Osmium\\Services\\Sage\\Models\\SageOrderSync::orderAction"
+        ]
+    },
+
+    "admin": {
+        "menu": {
+            "section": "Content",
+            "items": [
+                {
+                    "id": "sage",
+                    "label": "Sage Accounting",
+                    "icon": "bx bx-receipt",
+                    "route": "admin/settings/sage",
+                    "activePattern": "admin/settings/sage",
+                    "role": null
+                }
+            ]
+        },
+        "routes": {
+            "admin/settings/sage": {
+                "controller": "controllers/SageController.php",
+                "class": "Osmium\\Services\\Sage\\Controllers\\SageController",
+                "method": "index",
+                "title": "Sage"
+            },
+            "admin/settings/sage/connect": {
+                "controller": "controllers/SageController.php",
+                "class": "Osmium\\Services\\Sage\\Controllers\\SageController",
+                "method": "connect",
+                "title": "Sage"
+            },
+            "admin/settings/sage/callback": {
+                "controller": "controllers/SageController.php",
+                "class": "Osmium\\Services\\Sage\\Controllers\\SageController",
+                "method": "callback",
+                "title": "Sage"
+            },
+            "admin/settings/sage/action": {
+                "controller": "controllers/SageController.php",
+                "class": "Osmium\\Services\\Sage\\Controllers\\SageController",
+                "method": "action",
+                "title": "Sage"
+            }
+        }
+    },
+
+    "setup": {
+        "requiresConnection": true,
+        "postInstallNote": "Pushing is locked until configured. Create an app in the Sage developer portal, enter its client ID/secret on the settings page and add the shown redirect URI as the app callback URL. Set Allowed business to the exact name of the Sage business, then connect, then pick the sales ledger account and tax rate. Pushing creates real invoices."
+    }
+}

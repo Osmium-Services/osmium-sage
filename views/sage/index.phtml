@@ -1,0 +1,165 @@
+<?php $sage = $admin['sage']; ?>
+<div class="d-flex justify-content-between align-items-center py-3 mb-4">
+    <h4 class="mb-0">
+        <span class="text-muted fw-light">Services /</span> Sage
+    </h4>
+    <button type="submit" form="settings-form" class="btn btn-primary">
+        <i class="bx bx-save me-1"></i> Save Settings
+    </button>
+</div>
+
+<?php if ($admin['flash'] ?? null): ?>
+    <div class="alert alert-<?= \htmlspecialchars($admin['flash']['type']) ?> alert-dismissible fade show" role="alert">
+        <?= \htmlspecialchars($admin['flash']['text']) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<?php if ($sage['error']): ?>
+    <div class="alert alert-danger"><i class="bx bx-error-circle me-1"></i> <?= \htmlspecialchars($sage['error']) ?></div>
+<?php endif; ?>
+
+<?php if ($sage['justConnected']): ?>
+    <div class="alert alert-success"><i class="bx bx-check-circle me-1"></i> Connected to Sage.</div>
+<?php endif; ?>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="alert alert-warning">
+            <i class="bx bx-error-circle me-1"></i>
+            Pushing an order creates a real <strong>posted</strong> invoice in Sage. Pushes are refused until
+            <em>Allowed business</em> below exactly matches the connected business.
+        </div>
+
+        <form method="POST" action="<?= $admin['basePath'] ?>settings/sage/" id="settings-form">
+            <input type="hidden" name="token" value="<?= $template['formToken'] ?? '' ?>">
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="mb-0"><i class="bx bx-receipt me-2"></i>Sage app</h5></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="client_id" class="form-label fw-semibold">Client ID</label>
+                        <input type="text" class="form-control" id="client_id" name="client_id"
+                            value="<?= \htmlspecialchars($sage['clientId']) ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="client_secret" class="form-label fw-semibold">Client Secret</label>
+                        <input type="password" class="form-control" id="client_secret" name="client_secret" autocomplete="new-password"
+                            <?= $sage['hasSecret'] ? 'placeholder="Leave blank to keep current"' : '' ?>>
+                        <div class="form-text">Stored server-side and never shown again.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="redirect_uri" class="form-label fw-semibold">Redirect URI</label>
+                        <input type="text" class="form-control" id="redirect_uri" name="redirect_uri"
+                            value="<?= \htmlspecialchars($sage['redirectUri']) ?>">
+                        <div class="form-text">Must match an entry under "Callback URL" on the Sage app exactly (protocol, trailing slash, everything).</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="country" class="form-label fw-semibold">Country</label>
+                            <select class="form-select" id="country" name="country">
+                                <?php foreach (['gb' => 'United Kingdom', 'ie' => 'Ireland', 'ca' => 'Canada'] as $code => $label) : ?>
+                                    <option value="<?= $code ?>" <?= $sage['country'] === $code ? 'selected' : '' ?>><?= $label ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="form-text">Must match the country of the Sage business.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="allowed_business_name" class="form-label fw-semibold">Allowed business</label>
+                            <input type="text" class="form-control" id="allowed_business_name" name="allowed_business_name"
+                                value="<?= \htmlspecialchars($sage['allowedBusinessName']) ?>">
+                            <div class="form-text">Exact name of the Sage business pushes may go to. Set it before connecting if your Sage login has more than one business.</div>
+                        </div>
+                    </div>
+                    <?php if ($sage['lookupError']) : ?>
+                        <div class="alert alert-danger"><i class="bx bx-error-circle me-1"></i> Could not load from Sage: <?= \htmlspecialchars($sage['lookupError']) ?></div>
+                    <?php endif; ?>
+                    <?php if ($sage['connected'] && !$sage['lookupError']) : ?>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ledger_account_id" class="form-label fw-semibold">Sales ledger account</label>
+                            <select class="form-select" id="ledger_account_id" name="ledger_account_id">
+                                <option value="">Choose...</option>
+                                <?php foreach ($sage['ledgerAccounts'] as $account) : ?>
+                                    <option value="<?= \htmlspecialchars($account['id']) ?>" <?= $sage['ledgerAccountId'] === $account['id'] ? 'selected' : '' ?>><?= \htmlspecialchars($account['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="form-text">Where order income is booked.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tax_rate_id" class="form-label fw-semibold">Tax rate</label>
+                            <select class="form-select" id="tax_rate_id" name="tax_rate_id">
+                                <option value="">Choose...</option>
+                                <?php foreach ($sage['taxRates'] as $rate) : ?>
+                                    <option value="<?= \htmlspecialchars($rate['id']) ?>" <?= $sage['taxRateId'] === $rate['id'] ? 'selected' : '' ?>><?= \htmlspecialchars($rate['name']) ?> (<?= \htmlspecialchars((string) $rate['percentage']) ?>%)</option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="form-text">Applied to every line, including delivery. Prices are treated as excluding tax.</div>
+                        </div>
+                    </div>
+                    <?php elseif (!$sage['connected']) : ?>
+                        <p class="text-muted small mb-0">Connect to Sage below, then come back here to choose the ledger account and tax rate.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </form>
+
+        <div class="card mb-4">
+            <div class="card-header"><h5 class="mb-0">Connection</h5></div>
+            <div class="card-body">
+                <?php if (!$sage['clientConfigured']): ?>
+                    <div class="alert alert-warning mb-0">Save a client ID and secret first.</div>
+                <?php elseif ($sage['connected']): ?>
+                    <p class="mb-1">
+                        <span class="badge bg-success">Connected</span>
+                        to <strong><?= \htmlspecialchars($sage['businessName'] ?? '') ?></strong>
+                    </p>
+                    <p class="text-muted small mb-4">Connected since <?= \htmlspecialchars($sage['connectedAt'] ?? '') ?></p>
+                    <button type="button" class="btn btn-outline-primary" onclick="testConnection()">
+                        <i class="bx bx-refresh me-1"></i> Test Connection
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" onclick="disconnectSage()">
+                        <i class="bx bx-unlink me-1"></i> Disconnect
+                    </button>
+                    <div id="sageActionResult" class="mt-3"></div>
+                <?php else: ?>
+                    <p class="text-muted mb-3">Not connected. Orders can't be pushed to Sage until you connect a business.</p>
+                    <a href="<?= $admin['basePath'] ?>settings/sage/connect/" class="btn btn-primary">
+                        <i class="bx bx-link me-1"></i> Connect to Sage
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.csrfToken = <?= \json_encode($template['formToken'] ?? '') ?>;
+
+async function postSageAction(action) {
+    const response = await fetch('<?= $admin['basePath'] ?>settings/sage/action/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, csrf_token: window.csrfToken }),
+    });
+    return response.json();
+}
+
+async function testConnection() {
+    const resultEl = document.getElementById('sageActionResult');
+    resultEl.textContent = 'Testing...';
+
+    const result = await postSageAction('test_connection');
+    resultEl.innerHTML = '';
+    const alert = document.createElement('div');
+    alert.className = 'alert mb-0 alert-' + (result.success ? 'success' : 'danger');
+    alert.textContent = result.success ? 'Connected to "' + (result.business || '') + '".' : (result.error || 'Connection test failed');
+    resultEl.appendChild(alert);
+}
+
+async function disconnectSage() {
+    // Not confirm(): native dialogs block browser automation; reconnecting is one click.
+    const result = await postSageAction('disconnect');
+    if (result.success) window.location.reload();
+    else document.getElementById('sageActionResult').textContent = result.error || 'Failed to disconnect';
+}
+</script>
