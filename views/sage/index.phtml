@@ -114,10 +114,10 @@
                         to <strong><?= \htmlspecialchars($sage['businessName'] ?? '') ?></strong>
                     </p>
                     <p class="text-muted small mb-4">Connected since <?= \htmlspecialchars($sage['connectedAt'] ?? '') ?></p>
-                    <button type="button" class="btn btn-outline-primary" onclick="testConnection()">
+                    <button type="button" class="btn btn-outline-primary" data-call="testConnection">
                         <i class="bx bx-refresh me-1"></i> Test Connection
                     </button>
-                    <button type="button" class="btn btn-outline-danger" onclick="disconnectSage()">
+                    <button type="button" class="btn btn-outline-danger" data-call="disconnectSage">
                         <i class="bx bx-unlink me-1"></i> Disconnect
                     </button>
                     <div id="sageActionResult" class="mt-3"></div>
@@ -132,7 +132,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="<?= $cspNonce ?? '' ?>">
 window.csrfToken = <?= \json_encode($template['formToken'] ?? '') ?>;
 
 async function postSageAction(action) {
