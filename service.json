@@ -1,7 +1,7 @@
 {
     "id": "sage",
     "name": "Sage Accounting",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Connects the shop to Sage Accounting (OAuth2) and adds a 'Push to Sage' button on paid orders that creates a sales invoice. Locked to one named Sage business",
     "category": "business",
     "author": {
@@ -12,7 +12,8 @@
     "requires": {
         "osmium": ">=1.0.0",
         "php": ">=8.1",
-        "services": []
+        "services": [],
+        "shop": true
     },
 
     "autoload": [
