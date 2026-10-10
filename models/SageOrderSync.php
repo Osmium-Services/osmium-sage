@@ -32,6 +32,8 @@ class SageOrderSync
             'canPush' => $invoice === null && \in_array($order['status'], self::PUSHABLE_STATUSES, true),
         ];
 
+        $cspNonce = \Osmium\Core\OsmiumSecurity::requestNonce(); // The view's inline script is blocked without it
+
         \ob_start();
         require __DIR__ . '/../views/sage/order-panel.phtml';
 
