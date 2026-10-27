@@ -1,11 +1,11 @@
 {
     "id": "sage",
     "name": "Sage Accounting",
-    "version": "1.1.3",
+    "version": "1.1.4",
     "description": "Connects the shop to Sage Accounting (OAuth2) and adds a 'Push to Sage' button on paid orders that creates a sales invoice. Locked to one named Sage business",
     "category": "business",
     "website": "https://www.sage.com",
-    "account": {"required": "paid", "note": "Needs a Sage Accounting subscription."},
+    "account": {"required": "paid", "note": "Needs a Sage Accounting subscription. Creating sales invoices works on every Sage plan."},
     "author": {
         "name": "Gavin Cox"
     },
