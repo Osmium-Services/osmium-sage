@@ -24,7 +24,7 @@
 <?php endif; ?>
 
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-4">
         <div class="alert alert-warning">
             <i class="bx bx-error-circle me-1"></i>
             Pushing an order creates a real <strong>posted</strong> invoice in Sage. Pushes are refused until
@@ -53,48 +53,44 @@
                             value="<?= \htmlspecialchars($sage['redirectUri']) ?>">
                         <div class="form-text">Must match an entry under "Callback URL" on the Sage app exactly (protocol, trailing slash, everything).</div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="country" class="form-label fw-semibold">Country</label>
-                            <select class="form-select" id="country" name="country">
-                                <?php foreach (['gb' => 'United Kingdom', 'ie' => 'Ireland', 'ca' => 'Canada'] as $code => $label) : ?>
-                                    <option value="<?= $code ?>" <?= $sage['country'] === $code ? 'selected' : '' ?>><?= $label ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="form-text">Must match the country of the Sage business.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="allowed_business_name" class="form-label fw-semibold">Allowed business</label>
-                            <input type="text" class="form-control" id="allowed_business_name" name="allowed_business_name"
-                                value="<?= \htmlspecialchars($sage['allowedBusinessName']) ?>">
-                            <div class="form-text">Exact name of the Sage business pushes may go to. Set it before connecting if your Sage login has more than one business.</div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="country" class="form-label fw-semibold">Country</label>
+                        <select class="form-select" id="country" name="country">
+                            <?php foreach (['gb' => 'United Kingdom', 'ie' => 'Ireland', 'ca' => 'Canada'] as $code => $label) : ?>
+                                <option value="<?= $code ?>" <?= $sage['country'] === $code ? 'selected' : '' ?>><?= $label ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text">Must match the country of the Sage business.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="allowed_business_name" class="form-label fw-semibold">Allowed business</label>
+                        <input type="text" class="form-control" id="allowed_business_name" name="allowed_business_name"
+                            value="<?= \htmlspecialchars($sage['allowedBusinessName']) ?>">
+                        <div class="form-text">Exact name of the Sage business pushes may go to. Set it before connecting if your Sage login has more than one business.</div>
                     </div>
                     <?php if ($sage['lookupError']) : ?>
                         <div class="alert alert-danger"><i class="bx bx-error-circle me-1"></i> Could not load from Sage: <?= \htmlspecialchars($sage['lookupError']) ?></div>
                     <?php endif; ?>
                     <?php if ($sage['connected'] && !$sage['lookupError']) : ?>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="ledger_account_id" class="form-label fw-semibold">Sales ledger account</label>
-                            <select class="form-select" id="ledger_account_id" name="ledger_account_id">
-                                <option value="">Choose...</option>
-                                <?php foreach ($sage['ledgerAccounts'] as $account) : ?>
-                                    <option value="<?= \htmlspecialchars($account['id']) ?>" <?= $sage['ledgerAccountId'] === $account['id'] ? 'selected' : '' ?>><?= \htmlspecialchars($account['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="form-text">Where order income is booked.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="tax_rate_id" class="form-label fw-semibold">Tax rate</label>
-                            <select class="form-select" id="tax_rate_id" name="tax_rate_id">
-                                <option value="">Choose...</option>
-                                <?php foreach ($sage['taxRates'] as $rate) : ?>
-                                    <option value="<?= \htmlspecialchars($rate['id']) ?>" <?= $sage['taxRateId'] === $rate['id'] ? 'selected' : '' ?>><?= \htmlspecialchars($rate['name']) ?> (<?= \htmlspecialchars((string) $rate['percentage']) ?>%)</option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="form-text">Applied to every line, including delivery. Prices are treated as excluding tax.</div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="ledger_account_id" class="form-label fw-semibold">Sales ledger account</label>
+                        <select class="form-select" id="ledger_account_id" name="ledger_account_id">
+                            <option value="">Choose...</option>
+                            <?php foreach ($sage['ledgerAccounts'] as $account) : ?>
+                                <option value="<?= \htmlspecialchars($account['id']) ?>" <?= $sage['ledgerAccountId'] === $account['id'] ? 'selected' : '' ?>><?= \htmlspecialchars($account['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text">Where order income is booked.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tax_rate_id" class="form-label fw-semibold">Tax rate</label>
+                        <select class="form-select" id="tax_rate_id" name="tax_rate_id">
+                            <option value="">Choose...</option>
+                            <?php foreach ($sage['taxRates'] as $rate) : ?>
+                                <option value="<?= \htmlspecialchars($rate['id']) ?>" <?= $sage['taxRateId'] === $rate['id'] ? 'selected' : '' ?>><?= \htmlspecialchars($rate['name']) ?> (<?= \htmlspecialchars((string) $rate['percentage']) ?>%)</option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text">Applied to every line, including delivery. Prices are treated as excluding tax.</div>
                     </div>
                     <?php elseif (!$sage['connected']) : ?>
                         <p class="text-muted small mb-0">Connect to Sage below, then come back here to choose the ledger account and tax rate.</p>
